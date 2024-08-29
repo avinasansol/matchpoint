@@ -1,0 +1,40 @@
+{% extends 'admin_layout.html' %}
+{% block title %}Add New User{% endblock %}
+{% block content %}
+    <div class="login-box">
+		<h1>Add New User</h1>
+    </div>
+    <div class="login-box">
+        <form action="/add-user" method="post">
+            <label for="email">Phone No:</label>
+            <input type="tel" id="email" name="email" required value="{{ email }}">
+            <label for="initial_pass">Initial Password:</label>
+            <input type="text" id="initial_pass" name="initial_pass" required value="{{ initial_pass }}">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required value="{{ name }}">
+            <label for="user_type">User Type:</label>
+            <select id="user_type" name="user_type">
+                <option value="U" {% if user_type=='U' %} selected {% endif %}>Normal User</option>
+                <option value="A" {% if user_type=='A' %} selected {% endif %}>Admin</option>
+            </select><br />
+
+			<!-- Flash Messages -->
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					{% for category, message in messages %}
+						<div class="alert alert-{{ category }}">
+							{{ message }}<br /><br />
+						</div>
+						<script>
+							// Wait for the page to fully load
+							window.onload = function() {
+								alert("{{ message }}");
+							};
+						</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %}
+            <input type="submit" value="Add User">
+        </form>
+    </div>
+{% endblock %}

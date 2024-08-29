@@ -1,0 +1,112 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Jura:wght@500;600;900&display=swap");
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-image: url('/static/images/background-1.jpeg');
+    background-size: cover; /* Ensure the background image covers the entire background */
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+	font-family: "Jura", sans-serif;
+	font-size: 100%;
+	min-height: 100%;
+	line-height: 1.5;
+}
+
+.logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 200px; /* Adjust width as needed */
+    height: auto; /* Maintain aspect ratio */
+    z-index: -10;
+}
+
+.login-box {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.3); /* Box shadow for depth */
+    max-width: 500px; /* Set a maximum width for the login box */
+    width: 90%;
+}
+
+.login-box h1, p {
+    text-align: center;
+    color: #333;
+}
+
+.login-box form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-box label {
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.login-box input[type="email"],
+.login-box input[type="tel"],
+.login-box input[type="password"] {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    padding: 15px 10px 15px 50px;
+	background: url(../images/login.png) no-repeat;
+}
+
+#password, #new-password, #confirm-password { background-position: 10px -53px !important }
+#email { background-position: 6px -115px !important }
+
+.login-box input[type="submit"] {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; /* Blue color for submit button */
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-box input[type="submit"]:hover {
+    background-color: #0056b3; /* Darker shade of blue on hover */
+}
+
+/* Media query for mobile devices */
+@media only screen and (max-width: 600px) {
+    .login-box {
+        padding: 10px; /* Adjust padding for smaller screens */
+        max-width: 90%; /* Adjust the maximum width for smaller screens */
+    }
+}
+@media only screen and (max-width: 1080px) {
+	body {
+		background-image: url('/static/images/background-2.jpeg');
+	}
+	.logo {
+		width: 300px; /* Adjust width as needed */
+	}
+}
+
+.alert {
+	font-size:14px;
+}
+
+.alert-success {
+	color: #279846;
+}
+
+.alert-error {
+	color: #e43e31;
+	text-align: center;
+	font-weight:bold;
+}

@@ -1,0 +1,65 @@
+{% extends 'admin_layout.html' %}
+{% block title %}Add New Match{% endblock %}
+{% block content %}
+    <div class="login-box">
+		<h1>Add New Match</h1>
+    </div>
+    <div class="login-box">
+        <form action="/add-match" method="post">
+            <label for="series_id">Series:</label>
+            <select id="series_id" name="series_id" required>
+                <option value="{% if series_id %}{{ series_id }}{% endif %}">{% if series_name %}{{ series_name }}{% endif %}</option>
+                {% for series in series_list %}
+					{% if not series_id %}
+					<option value="{{ series[0] }}">{{ series[1] }}</option>
+					{% elif (series_id != series[0]) %}
+					<option value="{{ series[0] }}">{{ series[1] }}</option>
+					{% endif %}
+                {% endfor %}
+            </select>
+            <label for="date_time">Date Time:</label>
+            <input type="datetime-local" id="date_time" name="date_time" required value="{{ date_time }}">
+            <label for="place">Venue:</label>
+            <input type="text" id="place" name="place" required value="{{ place }}">
+            <label for="team_1">Team 1:</label>
+            <select id="team_1" name="team_1" required>
+                <option value="{% if team_1 %}{{ team_1 }}{% endif %}">{% if team_1_name %}{{ team_1_name }}{% endif %}</option>
+                {% for team in team_list %}
+					{% if not team_1 %}
+					<option value="{{ team[0] }}">{{ team[1] }}</option>
+					{% elif (team_1 != team[0]) %}
+					<option value="{{ team[0] }}">{{ team[1] }}</option>
+					{% endif %}
+                {% endfor %}
+            </select>
+            <label for="team_2">Team 2:</label>
+            <select id="team_2" name="team_2" required>
+                <option value="{% if team_2 %}{{ team_2 }}{% endif %}">{% if team_2_name %}{{ team_2_name }}{% endif %}</option>
+                {% for team in team_list %}
+					{% if not team_2 %}
+					<option value="{{ team[0] }}">{{ team[1] }}</option>
+					{% elif (team_2 != team[0]) %}
+					<option value="{{ team[0] }}">{{ team[1] }}</option>
+					{% endif %}
+                {% endfor %}
+            </select><br />
+			<!-- Flash Messages -->
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					{% for category, message in messages %}
+						<div class="alert alert-{{ category }}">
+							{{ message }}<br /><br />
+						</div>
+						<script>
+							// Wait for the page to fully load
+							window.onload = function() {
+								alert("{{ message }}");
+							};
+						</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %}
+            <input type="submit" value="Add Match">
+        </form>
+    </div>
+{% endblock %}

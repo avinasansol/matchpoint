@@ -1,0 +1,30 @@
+{% extends 'admin_layout.html' %}
+{% block title %}Add New Series{% endblock %}
+{% block content %}
+    <div class="login-box">
+		<h1>Add New Series</h1>
+    </div>
+    <div class="login-box">
+        <form action="/add-series" method="post">
+            <label for="series_name">Series Name:</label>
+            <input type="text" id="series_name" name="series_name" required value="{{ series_name }}"><br />
+			<!-- Flash Messages -->
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					{% for category, message in messages %}
+						<div class="alert alert-{{ category }}">
+							{{ message }}<br /><br />
+						</div>
+						<script>
+							// Wait for the page to fully load
+							window.onload = function() {
+								alert("{{ message }}");
+							};
+						</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %}
+            <input type="submit" value="Add Series">
+        </form>
+    </div>
+{% endblock %}

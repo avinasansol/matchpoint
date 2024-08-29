@@ -1,0 +1,280 @@
+{% extends 'layout.html' %}
+{% block title %}Match Details & Poll for {{ match['Team_1_SN'] }} Vs {{ match['Team_2_SN'] }} -  {{ match['Match_Date'] }}{% endblock %}
+{% block ogmeta %}
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Match Details & Poll for {{ match['Team_1_SN'] }} Vs {{ match['Team_2_SN'] }} -  {{ match['Match_Date'] }}">
+    <meta property="og:description" content="View match details and participate in the poll for the IPL 2024 match between {{ match['Team_1_Name'] }} ({{ match['Team_1_SN'] }}) and {{ match['Team_2_Name'] }} ({{ match['Team_2_SN'] }}) on {{ match['Match_Date'] }}.">
+{% endblock %}
+{% block content %}
+	<style>
+		.login-box ul {
+			list-style-type: none;
+			padding: 0;
+		}
+	</style>
+    <div class="login-box">
+		<h1>Match Details</h1>
+		<ul>
+			<li><strong>Series:</strong> {{ match['Series_Name'] }}</li>
+			<li><strong>Match Date:</strong> {{ match['Match_Date'] }}</li>
+			<li><strong>Match Time:</strong> {{ match['Match_Time'] }}</li>
+			<li><strong>Venue:</strong> {{ match['Place'] }}</li>
+			<li><strong>Teams:</strong><br />
+			{{ match['Team_1_Name'] }} ({{ match['Team_1_SN'] }})<br />Vs<br />{{ match['Team_2_Name'] }} ({{ match['Team_2_SN'] }})</li>
+			<li><strong>Winner:</strong>
+				{% if match['Winner'] == '1' %}
+					{{ match['Team_1_SN'] }}
+				{% elif match['Winner'] == '2' %}
+					{{ match['Team_2_SN'] }}
+				{% elif match['Winner'] == '0' %}
+					Undecided
+				{% else %}TBD{% endif %}
+			</li>
+			<li>
+				<strong>Status:</strong>
+				{% if match['Status'] == 'NS' %}
+				 Yet to start
+				{% else %}
+					{% if match['Winner'] == '1' or match['Winner'] == '2' %}
+					 Match Completed. Results Declared.
+					{% elif match['Winner'] == '0' %}
+					 Match Drawn.
+					{% else %}
+					 Match Started. Results yet to be declared.
+					{% endif %}
+				{% endif %}
+			</li>
+		</ul>
+	</div>
+	{% if session['user_name'] %}
+    <div class="login-box" id="matchpoll">
+		<h1>Poll for the Match: </h1>
+		{% if poll_counts %}
+            <style>
+                .container {
+                    display: flex;
+                    align-items: center;
+                    width:290px;
+                    margin-bottom: 10px;
+                }
+                .label {
+                    min-width: 40px;
+                    text-align: left;
+                    margin-right: 5px;
+                }
+                .bar {
+                    height: 20px;
+                    background-color: #CCCCCC;
+                    margin-right: 5px;
+                }
+            </style>
+            <div class="container">
+                <div class="label">{{ match['Team_1_SN'] }}:</div>
+                <div class="bar" style="width: {{ 15*poll_counts[0] }}px;{% if match['Winner'] == '1' %}background-color: #279846;{% endif %}{% if match['Winner'] == '2' %}background-color: #e43e31;{% endif %}"></div>
+                <div>{{ "%02d" | format(poll_counts[0]) }}</div>
+            </div>
+            <div class="container">
+                <div class="label">{{ match['Team_2_SN'] }}:</div>
+                <div class="bar" style="width: {{ 15*poll_counts[1] }}px;{% if match['Winner'] == '2' %}background-color: #279846;{% endif %}{% if match['Winner'] == '1' %}background-color: #e43e31;{% endif %}"></div>
+                <div>{{ "%02d" | format(poll_counts[1]) }}</div>
+            </div>
+            <div class="container">
+                <div class="label">NA:</div>
+                <div class="bar" style="width: {{ 15*poll_counts[2] }}px;"></div>
+                <div>{{ "%02d" | format(poll_counts[2]) }}</div>
+            </div><br />
+		{% endif %}
+		<!-- Flash Messages -->
+		{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+		{% for category, message in messages %}
+		<div class="alert alert-{{ category }}">
+			{{ message }}<br /><br />
+		</div>
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+	</div>
+    <table class="table-fill">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th style="text-align:center;">Poll Team</th>
+				{% if match['Status'] == 'AS' %}<th style="text-align:center;">Points</th>{% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in poll %}
+            <tr id="user-row-{{ row[2] }}">
+                <td>{{ row[0] }}</td>
+                <td style="text-align:center;">
+					{% if (match['Status'] == 'AS') or (user_id != row[2]) %}
+						{% if row[1] == match['Team_1_Id'] %}
+							{{ match['Team_1_SN'] }}
+						{% elif row[1] == match['Team_2_Id'] %}
+							{{ match['Team_2_SN'] }}
+						{% else %}--{% endif %}
+					{% else %}
+						<form action="/match?matchid={{ match['Match_Id'] }}" method="post">
+							<input type="hidden" name="userid" value="{{ row[2] }}" />
+							<select class="pollbutton" name="poll" id="poll" onchange="this.form.submit()" required>
+							{% if row[1] == match['Team_1_Id'] %}
+								<option value="{{ match.Team_1_Id }}">{{ match.Team_1_SN }}</option>
+								<option value="{{ match.Team_2_Id }}">{{ match.Team_2_SN }}</option>
+							{% elif row[1] == match['Team_2_Id'] %}
+								<option value="{{ match.Team_2_Id }}">{{ match.Team_2_SN }}</option>
+								<option value="{{ match.Team_1_Id }}">{{ match.Team_1_SN }}</option>
+							{% else %}
+								<option value=""></option>
+								<option value="{{ match.Team_1_Id }}">{{ match.Team_1_SN }}</option>
+								<option value="{{ match.Team_2_Id }}">{{ match.Team_2_SN }}</option>
+							{% endif %}
+							</select>
+						</form>
+					{% endif %}
+				</td>
+				{% if match['Status'] == 'AS' %}
+					<td style="text-align:center;">
+						{% if match['Winner'] %}
+							{% if row[3] %}{{ row[3] }}{% else %}0{% endif %}
+						{% else %}
+							TBD
+						{% endif %}
+					</td>
+				{% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+	{% else %}
+    <div class="login-box">
+		<h1>Login to view the Poll</h1>
+		<form action="/" method="post">
+			<input type="tel" id="email" name="email" placeholder="Phone No" required><br>
+			<input type="hidden" name="rlink" value="match?matchid={{ match['Match_Id'] }}#matchpoll" />
+			<input type="password" id="password" name="password" placeholder="Password" required><br>
+			{% if message %}
+			<div class="alert alert-error">
+				{{ message }}<br /><br />
+			</div>
+			{% endif %}
+			<input type="submit" value="Login">
+		</form>
+    </div>
+	<style>
+.login-box {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.3); /* Box shadow for depth */
+    max-width: 500px; /* Set a maximum width for the login box */
+    width: 90%;
+}
+
+.login-box h1, p {
+    text-align: center;
+    color: #333;
+}
+
+.login-box form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-box label {
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.login-box input[type="email"],
+.login-box input[type="tel"],
+.login-box input[type="password"] {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+    padding: 15px 10px 15px 50px;
+	background: url(static/images/login.png) no-repeat;
+}
+
+#password, #new-password, #confirm-password { background-position: 10px -53px !important }
+#email { background-position: 6px -115px !important }
+
+.login-box input[type="submit"] {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; /* Blue color for submit button */
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-box input[type="submit"]:hover {
+    background-color: #0056b3; /* Darker shade of blue on hover */
+}
+
+/* Media query for mobile devices */
+@media only screen and (max-width: 600px) {
+    .login-box {
+        padding: 10px; /* Adjust padding for smaller screens */
+        max-width: 90%; /* Adjust the maximum width for smaller screens */
+    }
+}
+	</style>
+	{% endif %}<br /><br />
+	<!-- Flash Messages -->
+	{% with messages = get_flashed_messages(with_categories=true) %}
+	{% if messages %}
+	{% for category, message in messages %}
+		<script>
+    // Wait for the page to fully load
+    window.onload = function() {
+        alert("{{ message }}");
+        // Get the target element by its ID
+        var targetElement = document.getElementById('user-row-{% if valid_poll_user_id %}{{ valid_poll_user_id }}{% endif %}');
+
+        // Get the previous sibling of the target element
+        var previousSibling = targetElement.previousElementSibling;
+
+        if (previousSibling !== null) {
+            // Scroll to the previous sibling element's position
+            previousSibling.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            // If there is no previous sibling, check if the table is available
+            var tableElement = document.querySelector('.table-fill');
+            if (tableElement !== null) {
+                // If the table is available, scroll to its position
+                tableElement.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                // If neither the previous sibling nor the table is available, scroll to the top of the page
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+    };
+</script>
+
+	{% endfor %}
+	{% endif %}
+	{% endwith %}
+
+<!-- Share button -->
+<div class="share-btn" id="shareBtn"></div>
+
+<script>
+  // Function to handle the click event of the share button
+  document.getElementById('shareBtn').addEventListener('click', function() {
+    // Get the current page URL
+    var pageUrl = window.location.href;
+    // Create the WhatsApp share link
+    var whatsappLink = 'https://wa.me/?text=' + encodeURIComponent(pageUrl);
+    // Open the WhatsApp share link in a new window
+    window.open(whatsappLink, '_blank');
+  });
+</script>
+
+
+{% endblock %}

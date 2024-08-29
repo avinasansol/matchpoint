@@ -1,0 +1,41 @@
+{% extends 'admin_layout.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    <div id="user-home" class="login-box" onclick="redirectToURL('{{ url_for('user_dashboard') }}')">
+		<h1>User Home</h1>
+	</div>
+    <div class="login-box" id="admin-box">
+		<h1>Admin Dashboard</h1>
+		<ul>
+			<li style="--accent-color:#0B374D" onclick="redirectToURL('{{ url_for('add_user') }}')">
+				<div class="title">Add New User</div>
+				<div class="descr">Add a new user to MatchPoint. This newly added user can be another admin or a regular user.</div>
+			</li>
+			<li style="--accent-color:#1286A8" onclick="redirectToURL('{{ url_for('add_series') }}')">
+				<div class="title">Add New Series</div>
+				<div class="descr">Add a new series to MatchPoint. Later you can add matches and give users access to it.</div>
+			</li>
+			<li style="--accent-color:#7EBD42" onclick="redirectToURL('{{ url_for('add_team') }}')">
+				<div class="title">Add New Team</div>
+				<div class="descr">Add a new team to MatchPoint. This new team can be selected while creating a match.</div>
+			</li>
+			<li style="--accent-color:#D2B53B" onclick="redirectToURL('{{ url_for('add_match') }}')">
+				<div class="title">Add New Match</div>
+				<div class="descr">Add a new match in a series. Users can vote for the winner of the match before it starts.</div>
+			</li>
+			<li style="--accent-color:#DA611E" onclick="redirectToURL('{{ url_for('add_user_to_series') }}')">
+				<div class="title">Add Users to a Series</div>
+				<div class="descr">Add users to a series so that they can have the access to vote for the matches in that series.</div>
+			</li>
+			<li style="--accent-color:#AC2A1A" onclick="redirectToURL('{{ url_for('select_match_winner') }}')">
+				<div class="title">Update A Match Winner</div>
+				<div class="descr">Updates the scores for the participants based on polls.</div>
+			</li>
+		</ul>
+	</div>
+    <script>
+        function redirectToURL(url) {
+            window.location.href = url;
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'admin_layout.html' %}
+{% block title %}Add New Team{% endblock %}
+{% block content %}
+    <div class="login-box">
+		<h1>Add New Team</h1>
+    </div>
+    <div class="login-box">
+        <form action="/add-team" method="post">
+            <label for="team_name">Team Name:</label>
+            <input type="text" id="team_name" name="team_name" required value="{{ team_name }}">
+            <label for="team_short_name">Team Short Name:</label>
+            <input type="text" id="team_short_name" name="team_short_name" required maxlength="3" value="{{ team_short_name }}"><br />
+			<!-- Flash Messages -->
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					{% for category, message in messages %}
+						<div class="alert alert-{{ category }}">
+							{{ message }}<br /><br />
+						</div>
+						<script>
+							// Wait for the page to fully load
+							window.onload = function() {
+								alert("{{ message }}");
+							};
+						</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %}
+            <input type="submit" value="Add Team">
+        </form>
+    </div>
+{% endblock %}

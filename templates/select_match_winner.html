@@ -1,0 +1,58 @@
+{% extends 'admin_layout.html' %}
+{% block title %}Update A Match Winner{% endblock %}
+{% block content %}
+    <div class="login-box">
+		<h1>Select A Match Winner</h1>
+    </div>
+    <div class="login-box">
+        <form action="/select-match-winner" method="post">
+			{% if match_id %}
+				<input type="hidden" name="match_id" value="{{ match_id }}" />
+				<p>
+					Match Details: <a href="{{ url_for('select_match_winner') }}">Change</a><br /><br />
+					Series: {{ match_series }}<br />
+					Date: {{ match_date }}<br />
+					Venue: {{ match_place }}<br />
+					Teams: {{ match_teamvsteam }}<br />
+				</p>
+				<label for="winner_id">Select Winner:</label>
+				<select id="winner_id" name="winner_id" required>
+					<option value="{{ match_team1_id }}">{{ match_team1_nm }}</option>
+					<option value="{{ match_team2_id }}">{{ match_team2_nm }}</option>
+					<option value="0">Match Drawn</option>
+				</select><br /><br />
+				<input type="hidden" name="update" value="yes" />
+				<input type="submit" value="Update Match Winner">
+			{% else %}
+				<label for="match_id">Select Match:</label>
+				{% if match_list %}
+					<select id="match_id" name="match_id" onchange="this.form.submit()" required>
+						<option value=""></option>
+						{% for match in match_list %}
+							{% set matchShortName = match[1][-10:] %}
+							<option value="{{ match[2] }}">{{ matchShortName }}: {{ match[9] }}:  {{ match[5] }} Vs {{ match[8] }}</option>
+						{% endfor %}
+					</select>
+					<!-- Flash Messages -->
+					{% with messages = get_flashed_messages(with_categories=true) %}
+						{% if messages %}
+							{% for category, message in messages %}
+								<div class="alert alert-{{ category }}">
+									<br />{{ message }}<br /><br />
+								</div>
+								<script>
+									// Wait for the page to fully load
+									window.onload = function() {
+										alert("{{ message }}");
+									};
+								</script>
+							{% endfor %}
+						{% endif %}
+					{% endwith %}
+				{% else %}
+					<p id="match_id">No more past matches yet to be updated.</p>
+				{% endif %}
+			{% endif %}<br>
+        </form>
+    </div>
+{% endblock %}

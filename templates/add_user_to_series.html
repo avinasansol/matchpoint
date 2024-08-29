@@ -1,0 +1,54 @@
+{% extends 'admin_layout.html' %}
+{% block title %}Add Users to a Series{% endblock %}
+{% block content %}
+	<style>
+.login-box form {
+    display: block;
+	text-align:left;
+}
+	</style>
+    <div class="login-box">
+		<h1>Add Users to a Series</h1>
+    </div>
+    <div class="login-box">
+        <form action="/add-user-to-series" method="post">
+            <br /><label for="useries_id"><b>Series:</b></label>
+			{% if useries_id %}
+				<input type="hidden" name="useries_id" value="{{ useries_id }}" />
+				<span id="useries_id">{% if useries_name %}{{ useries_name }}{% endif %}</span>
+				<a href="{{ url_for('add_user_to_series') }}">Change</a><br />
+			{% else %}
+				<select id="useries_id" name="useries_id" onchange="this.form.submit()" required>
+					<option value=""></option>
+					{% for series in series_list %}
+						<option value="{{ series[0] }}">{{ series[1] }}</option>
+					{% endfor %}
+				</select>
+			{% endif %}<br />
+			{% for user in user_list %}
+				<input type="checkbox" id="{{ user[0] }}" name="users" value="{{ user[0] }}" {% if user[2] is not none %}checked{% endif %}>
+				<label for="{{ user[0] }}">{{ user[1] }}</label><br />
+			{% endfor %}<br />
+			<!-- Flash Messages -->
+			{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+					{% for category, message in messages %}
+						<div class="alert alert-{{ category }}">
+							{{ message }}<br />
+						</div>
+						<script>
+							// Wait for the page to fully load
+							window.onload = function() {
+								alert("{{ message }}");
+							};
+						</script>
+					{% endfor %}
+				{% endif %}
+			{% endwith %}
+			{% if useries_id %}
+				<input type="hidden" name="update" value="yes" /><br >
+				<input type="submit" value="Update User List for the Series">
+			{% endif %}
+        </form>
+    </div>
+{% endblock %}

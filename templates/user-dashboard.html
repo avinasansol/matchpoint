@@ -1,0 +1,330 @@
+{% extends 'layout.html' %}
+{% block title %}User Dashboard{% endblock %}
+{% block content %}
+{% if series_access and series_access != 'No' %}
+		{% if (user_rank and user_score) %}
+			{% if ((user_rank == 1) and (user_score > 0)) %}
+
+<style>
+    #canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%; /* Cover the viewport width */
+        height: 100%; /* Cover the viewport height */
+        z-index: -1; /* Put the canvas in the background */
+    }
+</style>
+
+<canvas id="canvas"></canvas>
+<script>
+window.addEventListener("resize", resizeCanvas, false);
+        window.addEventListener("DOMContentLoaded", onLoad, false);
+
+        window.requestAnimationFrame =
+            window.requestAnimationFrame       ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame    ||
+            window.oRequestAnimationFrame      ||
+            window.msRequestAnimationFrame     ||
+            function (callback) {
+                window.setTimeout(callback, 1000/60);
+            };
+
+        var canvas, ctx, w, h, particles = [], probability = 0.04,
+            xPoint, yPoint;
+
+
+
+
+
+        function onLoad() {
+            canvas = document.getElementById("canvas");
+            ctx = canvas.getContext("2d");
+            resizeCanvas();
+
+            window.requestAnimationFrame(updateWorld);
+        }
+
+        function resizeCanvas() {
+            if (!!canvas) {
+                w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight;
+            }
+        }
+
+        function updateWorld() {
+            update();
+            paint();
+            window.requestAnimationFrame(updateWorld);
+        }
+
+        function update() {
+            if (particles.length < 500 && Math.random() < probability) {
+                createFirework();
+            }
+            var alive = [];
+            for (var i=0; i<particles.length; i++) {
+                if (particles[i].move()) {
+                    alive.push(particles[i]);
+                }
+            }
+            particles = alive;
+        }
+
+
+function paint() {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = "rgba(0, 0, 0, 0.02)"; // Adjust transparency as needed
+    ctx.fillRect(0, 0, w, h);
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i=0; i<particles.length; i++) {
+        particles[i].draw(ctx);
+    }
+}
+
+
+        function createFirework() {
+            xPoint = Math.random()*(w-200)+100;
+            yPoint = Math.random()*(h-200)+100;
+            var nFire = Math.random()*50+100;
+            var c = "rgb("+(~~(Math.random()*200+55))+","
+                 +(~~(Math.random()*200+55))+","+(~~(Math.random()*200+55))+")";
+            for (var i=0; i<nFire; i++) {
+                var particle = new Particle();
+                particle.color = c;
+                var vy = Math.sqrt(25-particle.vx*particle.vx);
+                if (Math.abs(particle.vy) > vy) {
+                    particle.vy = particle.vy>0 ? vy: -vy;
+                }
+                particles.push(particle);
+            }
+        }
+
+        function Particle() {
+            this.w = this.h = Math.random()*4+1;
+
+            this.x = xPoint-this.w/2;
+            this.y = yPoint-this.h/2;
+
+            this.vx = (Math.random()-0.5)*10;
+            this.vy = (Math.random()-0.5)*10;
+
+            this.alpha = Math.random()*.5+.5;
+
+            this.color;
+        }
+
+        Particle.prototype = {
+            gravity: 0.05,
+            move: function () {
+                this.x += this.vx;
+                this.vy += this.gravity;
+                this.y += this.vy;
+                this.alpha -= 0.01;
+                if (this.x <= -this.w || this.x >= screen.width ||
+                    this.y >= screen.height ||
+                    this.alpha <= 0) {
+                        return false;
+                }
+                return true;
+            },
+            draw: function (c) {
+                c.save();
+                c.beginPath();
+
+                c.translate(this.x+this.w/2, this.y+this.h/2);
+                c.arc(0, 0, this.w, 0, Math.PI*2);
+                c.fillStyle = this.color;
+                c.globalAlpha = this.alpha;
+
+                c.closePath();
+                c.fill();
+                c.restore();
+            }
+        }
+alert("Wow! 🎊 \nYou're leading the pack with first place! 🏆 🥇 \nKeep dominating! 💪");
+</script>
+			{% endif %}
+		{% endif %}
+{% endif %}
+
+{% if session['user_type'] %}
+    {% if session['user_type'] == "A" %}
+    <div class="login-box" onclick="redirectToURL('{{ url_for('admin_dashboard') }}')" style="cursor:pointer; padding-bottom:5px; padding-top:0px;">
+		<h1>Admin Home</h1>
+	</div>
+    <script>
+        function redirectToURL(url) {
+            window.location.href = url;
+        }
+    </script>
+    {% endif %}
+{% endif %}
+
+
+    <div class="login-box" style="padding-bottom:15px; padding-top:0px; background-color: rgba(255, 255, 255, 0.4);">
+    <form action="/user-dashboard" method="post">
+        <h1 style="margin-bottom:-25px;"><label for="series">Series:</label><h1>
+        <select name="series_id" id="series" onchange="this.form.submit()" required>
+            {% if series_id %}
+                <option value="{{ series_id }}">{{ series_name }}</option>
+            {% endif %}
+            {% for series in series_data %}
+				{% if (not series_id) or (series_id != series[0]) %}
+                <option value="{{ series[0] }}">{{ series[1] }}</option>
+				{% endif %}
+            {% endfor %}
+        </select>
+    </form>
+	</div>
+
+    <div class="login-box" style="padding-top:0px; padding-bottom:5px;">
+	<br />
+	<h1 style="margin-top:5px;"><b>Your Score: </b>{% if series_access and series_access == 'No' %}NA{% elif user_score %}{{ user_score }}{% else %}--{% endif %}</h1>
+	<h1 style="margin-top:-30px; margin-bottom:0px;"><b>Your Rank: </b>{% if series_access and series_access == 'No' %}NA{% elif (user_rank and user_score) %}{{ user_rank }}{% else %}--{% endif %}</h1>
+	{% if series_access and series_access != 'No' %}
+		{% if user_rank and user_score %}
+
+			{% if user_rank == 1 %}
+				<p style="color: #279846;font-style:italic;">Congratulations!<br />You're having rank #1. Keep it up!</p>
+			{% elif user_score < 0 %}
+				<p style="color: #e43e31;font-style:italic;">Not so Good! You're having a negative score.<br />Next target: try to get a positive score.</p>
+			{% elif user_rank < 4 %}
+				<p style="color: #279846;font-style:italic;">Going Great! You're having rank #{{ user_rank }}.<br />Next target: try to be the 1st.</p>
+			{% elif user_rank > 3 %}
+				<p style="color: #279846;font-style:italic;">Well Done! You're having a positive score.<br />Next target: to be among top 3.</p>
+			{% endif %}
+
+		{% endif %}
+	{% endif %}
+	<br />
+    </div>
+
+    {% if user_score_rank_list %}
+    <table class="table-fill">
+        <thead>
+            <tr>
+                <th class="text-left">User</th>
+                <th class="text-center">Rank</th>
+                <th class="text-center">Score</th>
+            </tr>
+        </thead>
+        <tbody class="table-hover">
+			{% for user in user_score_rank_list %}
+            <tr>
+                <td class="text-left">{{ user[0] }}</td>
+                <td class="text-center">{% if user[2] %}{{ user[1] }}{% else %}--{% endif %}</td>
+                <td class="text-center">{% if user[2] %}{{ user[2] }}{% else %}--{% endif %}</td>
+            </tr>
+			{% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <div class="login-box">
+		<h1>Matches:</h1>
+		{% if series_access and series_access == 'No' %}
+		<h3 style="font-size:16px;">As you're not a member of this series, you can't participate in the polls. Please contact Admin.</h3>
+		{% endif %}
+		<!-- Flash Messages -->
+		{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+		{% for category, message in messages %}
+		<div class="alert alert-{{ category }}">
+			{{ message }}<br /><br />
+		</div>
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+	</div>
+	<div class="container group">
+	{% if matches %}
+	{% for match_id, match in matches.items() %}
+		<div class="match-box" id="match-box{{ match.Match_Id }}">
+			<h2>{{ match.Match_Time }}</h2>
+			<div style="cursor:pointer;" onclick="redirectToMatch('/match?matchid={{ match.Match_Id }}')">
+				<h3><span class="uppercase">{{ match.Match_Date }}</span></h3>
+				<p>{{ match.Team_1_Name }}<br />({{ match.Team_1_SN }})</p>
+				<span>Vs</span>
+				<p>{{ match.Team_2_Name }}<br />({{ match.Team_2_SN }})</p>
+			</div>
+			<ul>
+				<li>Venue: {{ match.Place }}</li>
+			</ul>
+			<p>
+			{% if (series_access and series_access == 'No') or match.Status == 'AS' %}
+				Winner:
+				{% if match.Winner == '0' %}
+					Undecided
+				{% elif match.Winner == '1' %}
+					{{ match.Team_1_SN }}
+				{% elif match.Winner == '2' %}
+					{{ match.Team_2_SN }}
+				{% else %}
+					TBD
+				{% endif %}
+			{% else %}
+				Your Poll:
+			{% endif %}
+			</p>
+			{% if (series_access and series_access == 'No') or match.Status == 'AS' %}
+				Your Poll:
+				{% if match.Poll_Team == match.Team_1_Id %}
+					{{ match.Team_1_SN }}
+				{% elif match.Poll_Team == match.Team_2_Id %}
+					{{ match.Team_2_SN }}
+				{% else %}
+					NA
+				{% endif %}
+			{% else %}
+				<form action="/user-dashboard" method="post">
+					<input type="hidden" name="series_id" value="{% if series_id %}{{ series_id }}{% endif %}" />
+					<input type="hidden" name="match_id" value="{{ match.Match_Id }}" />
+					<select class="button" name="poll" id="poll" onchange="this.form.submit()" required>
+					{% if match.Poll_Team == match.Team_1_Id %}
+						<option value="{{ match.Team_1_Id }}">{{ match.Team_1_SN }}</option>
+						<option value="{{ match.Team_2_Id }}">{{ match.Team_2_SN }}</option>
+					{% elif match.Poll_Team == match.Team_2_Id %}
+						<option value="{{ match.Team_2_Id }}">{{ match.Team_2_SN }}</option>
+						<option value="{{ match.Team_1_Id }}">{{ match.Team_1_SN }}</option>
+					{% else %}
+						<option value=""></option>
+						<option value="{{ match.Team_1_Id }}">{{ match.Team_1_SN }}</option>
+						<option value="{{ match.Team_2_Id }}">{{ match.Team_2_SN }}</option>
+					{% endif %}
+					</select>
+				</form>
+			{% endif %}
+		</div>
+	{% endfor %}
+	{% endif %}
+	</div>
+    <script>
+        function redirectToMatch(url) {
+            window.location.href = url;
+        }
+    </script>
+	<!-- Flash Messages -->
+	{% with messages = get_flashed_messages(with_categories=true) %}
+	{% if messages %}
+	{% for category, message in messages %}
+		<script>
+			// Wait for the page to fully load
+			window.onload = function() {
+				alert("{{ message }}");
+				// Get the target element by its ID
+				var targetElement = document.getElementById('match-box{% if poll_match_id %}{{ poll_match_id }}{% endif %}');
+
+				if (targetElement !== null) {
+					targetElement.scrollIntoView({ behavior: 'smooth' });
+				} else {
+					window.scrollTo({ top: 0, behavior: 'smooth' });
+				}
+			};
+		</script>
+	{% endfor %}
+	{% endif %}
+	{% endwith %}
+
+{% endblock %}

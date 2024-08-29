@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+{% block title %}Account Settings{% endblock %}
+{% block content %}
+    <a href="{{ url_for('login') }}"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo"></a>
+    <div class="login-box">
+		{% if temppass %}<p>Welcome {{ session['user_name'] }}! You have logged in using a temporary password.</p>{% endif %}
+		<h1>{% if temppass %}Please {% endif %}Change Your Password</h1>
+		<form action="/account-settings" method="post" onsubmit="return validatePassword()">
+			<input type="password" id="new-password" name="new_password" placeholder="New Password" required><br>
+			<input type="password" id="confirm-password" name="confirm_password" placeholder="Retype Password" required><br>
+			{% if message %}
+			<div class="alert alert-error">
+				{{ message }}<br /><br />
+			</div>
+			{% endif %}
+			<input type="submit" value="Change Password">
+		</form>
+	</div>
+    <script>
+        function validatePassword() {
+            var password = document.getElementById("new-password").value;
+            var confirmPassword = document.getElementById("confirm-password").value;
+            var passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+            if (!passwordRegex.test(password)) {
+                alert("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one numeric digit.");
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+{% endblock %}

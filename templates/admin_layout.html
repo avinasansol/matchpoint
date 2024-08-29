@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>MatchPoint Admin - {% block title %}{% endblock %}</title>
+	<meta name="author" content="JhaAvinash">
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin.css') }}">
+	{% if request.path == url_for('admin_dashboard') %}
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+	{% endif %}
+</head>
+<body>
+	<!-- Header -->
+	<header>
+		<div class="logo">
+			<a href='/'><img src="static/images/logo-2.png" alt="Logo"></a>
+		</div>
+		<div class="user-greeting">
+			<h2>Hi {{ session['user_name'] }}!</h2>
+			<nav>
+				<a href="/logout" class="logout-button">Log Out</a>
+			</nav>
+		</div>
+	</header>
+	{% block content %}{% endblock %}
+	<!-- Footer -->
+	<footer>
+		<p>&copy; 2024 MatchPoint - Fun with Cricket</p>
+	</footer>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<title>MatchPoint - {% block title %}{% endblock %}</title>
+	{% block ogmeta %}{% endblock %}    <meta property="og:image" content="{{ request.url_root }}{{ url_for('static', filename='images/matchpoint-banner.jpeg') }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="website">
+
+	<meta name="author" content="JhaAvinash">
+	<link rel="icon" type="image/png" href="/static/images/favicon.ico">
+	{% if request.path == url_for('user_dashboard') %}
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/matchbox.css') }}">
+	{% endif %}
+
+	{% if request.path == url_for('match') %}
+		<style>
+  /* Style for the share button */
+  .share-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-image: url('/static/images/WhatsApp_icon.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    cursor: pointer;
+  }
+</style>
+	{% endif %}
+
+	{% if request.path != url_for('login') and request.path != url_for('account_settings') %}
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/user.css') }}">
+	{% else %}
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
+	{% endif %}
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+	{% if request.path != url_for('login') and request.path != url_for('account_settings') %}
+		<!-- Header -->
+		<header>
+			<div class="logo">
+				<a href='/'><img src="static/images/logo-2.png" alt="Logo"></a>
+			</div>
+			<div class="user-greeting">
+				{% if session['user_name'] %}<h2>Hi {{ session['user_name'] }}!</h2>{% endif %}
+				<nav>
+					{% if session['user_name'] %}<a href="/logout" class="logout-button">Log Out</a>{% endif %}
+				</nav>
+			</div>
+		</header>
+	{% endif %}
+	{% block content %}{% endblock %}
+	{% if request.path != url_for('login') and request.path != url_for('account_settings') %}
+		<!-- Footer -->
+		<footer>
+			<p>&copy; 2024 MatchPoint - Fun with Cricket</p>
+		</footer>
+	{% endif %}
+</body>
+</html>
